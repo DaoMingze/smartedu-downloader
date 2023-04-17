@@ -1,28 +1,29 @@
 // ==UserScript==
-// @name         国家中小学智慧教育平台电子课本下载
-// @namespace    https://github.com/amakerlife
-// @version      1.1.4
-// @description  在国家中小学智慧教育平台网站中添加电子课本下载按钮，免登录下载电子课本
-// @author       Makerlife
-// @match        https://*.smartedu.cn/tchMaterial/detail*
-// @match        https://*.smartedu.cn/elecedu/detail*
+// @name         国家智慧教育公共服务平台电子书下载
+// @namespace    https://github.com/DaoMingze/smartedu-downloader
+// @version      0.0.1
+// @description  国家智慧教育公共服务平台增加电子书下载按钮，免登录下载电子课本
+// @author       Makerlife, DaoMingze
+// @match        https://*.smartedu.cn/*/detail*
 // @match        https://www.zxx.edu.cn/tchMaterial/detail*
+// @match        https://reading.smartedu.cn/youth/detail*
 // @icon         https://basic.smartedu.cn/favicon.ico
 // @license      MIT
 // @grant        none
 // ==/UserScript==
 
-const pdfUrlRegExp = /\/pdf.pdf$/;
+const pdfUrlRegExp = /\/.pdf$/;
 const originalFetch = window.fetch;
-window.fetch = function() {
-  return originalFetch.apply(this, arguments).then(response => {
-    if (pdfUrlRegExp.test(response.url)) {
-      console.log('PDF URL: ' + response.url);
-      localStorage.setItem('pdfUrl', response.url);
-    }
-    return response;
-  });
+window.fetch = function () {
+	return originalFetch.apply(this, arguments).then(response => {
+		if (pdfUrlRegExp.test(response.url)) {
+			console.log('PDF URL: ' + response.url);
+			localStorage.setItem('pdfUrl', response.url);
+		}
+		return response;
+	});
 };
+
 
 
 const downloadBtn = document.createElement('div');
@@ -67,13 +68,19 @@ style.textContent = `
 document.head.appendChild(style);
 
 
-downloadBtn.addEventListener('click', function() {
-  const pdfUrl = localStorage.getItem('pdfUrl');
-  if (pdfUrl) {
-    window.open(pdfUrl, '_blank');
-  } else {
-    console.log('No PDF URL');
-  }
+downloadBtn.addEventListener('click', function () {
+	const pdfUrl = localStorage.getItem('pdfUrl');
+    var bookurl = window.parent["excel-iframe"].src.toString().split("#")[0].split("=")[1];
+	if (pdfUrl) {
+		window.open(pdfUrl, '_blank');
+	}
+	else if(bookurl !== ""){
+		window.open(decodeURIComponent(bookurl), "_blank");
+	}
+	else {
+		console.log('No PDF URL');
+
+	}
 });
 
 document.body.appendChild(downloadBtn);
